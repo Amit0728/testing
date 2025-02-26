@@ -151,3 +151,15 @@ try {
         # Send-MailMessage -To $emailTo -Cc $emailCC -From $psMailCred.UserName -UseSsl -Subject "DML Ticket - $($parameters.RITM)" -Body $body -Credential $psMailCred -SmtpServer "hexaware-com.mail.protection.outlook.com" -Port 25 -Encoding ([System.Text.Encoding]::UTF8) -ErrorAction Stop
     }
 }
+
+
+$GITCredential = @{
+    username = 'GitAutomationUser'
+    password = 'GitAutomation@2025'
+    }
+
+$URL1 = "https://github.com/Hexaware-Repo/AppopsDBA"
+
+$cmd = ("cd C:\Temp; git clone ""{0}"" --config user.name={1} --config user.password=""{2}""" -f $URL1, $GITCredential.UserName, $GITCredential.Password)            
+
+Invoke-Expression $cmd
