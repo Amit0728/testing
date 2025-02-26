@@ -51,7 +51,7 @@ try {
     $appName = $parameters.ApplicationName
     $eventType = ""
     $status = ""
-    $QueryText = "Select * from Users"
+    $QueryText = ""
 
     Write-Output "Using SQL credentials: $($sqlCredential.UserName)"
 
@@ -59,6 +59,9 @@ try {
         if (-not [string]::IsNullOrWhiteSpace($url)) {
             $url = $url.Trim()
             Write-Output "URL: $url"
+
+            $parent = Split-Path $url -Parent -Replace '\\', '/' -Replace ' ', '%20'
+            $url = $url -Replace [regex]::Escape($parent), $parent
 
             $cmd = "cd C:\Temp && git clone `"$url`" --config user.name=$($gitCredential.UserName) --config user.password=$($gitCredential.GetNetworkCredential().Password)"
             Invoke-Expression $cmd
@@ -138,7 +141,7 @@ try {
             $exception = "$errormessage, Task execution failed for the next query with the reason: $_.Exception.Message"
         }
         $params = @{"state" = 1; "assigned_to" = ""; "assignment_group" = $parameters.EjectionGroup; "work_notes" = $exception; "u_automation_ejected_comments" = $exception}
-        #Invoke-WebRequest -Uri $parameters.Url -Headers $Headers -Method PATCH -Body ($params | ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
+        Invoke-WebRequest -Uri $parameters.Url -Headers $Headers -Method PATCH -Body ($params | ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
 
         # Send email (uncomment and configure if needed)
         # $psMailCred = Get-Credential -Message "Enter email credentials"
@@ -148,6 +151,3 @@ try {
         # Send-MailMessage -To $emailTo -Cc $emailCC -From $psMailCred.UserName -UseSsl -Subject "DML Ticket - $($parameters.RITM)" -Body $body -Credential $psMailCred -SmtpServer "hexaware-com.mail.protection.outlook.com" -Port 25 -Encoding ([System.Text.Encoding]::UTF8) -ErrorAction Stop
     }
 }
-
-Task execution failed, putting the ticket to WIP with reason: You cannot call a method on a null-valued expression..Excep
-tion.Message.
