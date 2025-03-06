@@ -163,3 +163,36 @@ $URL1 = "https://github.com/Hexaware-Repo/AppopsDBA"
 $cmd = ("cd C:\Temp; git clone ""{0}"" --config user.name={1} --config user.password=""{2}""" -f $URL1, $GITCredential.UserName, $GITCredential.Password)            
 
 Invoke-Expression $cmd
+
+
+
+
+
+
+
+
+
+
+
+
+$GITToken = "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"  # Replace with your actual token
+$URL1 = "https://github.com/Hexaware-Repo/AppopsDBA"
+
+# Set environment variable for this session
+$env:GIT_TOKEN = $GITToken
+
+# Configure Git to use the token from environment
+git config --global credential.helper "!f() { echo username=x-oauth-token; echo password=\$GIT_TOKEN; }; f"
+
+# Define the command string with proper quoting
+$cmd = "cd C:\Temp; git clone `"$URL1`""
+
+# Verify the command is not null
+if ([string]::IsNullOrEmpty($cmd)) {
+    Write-Error "Command string is empty or null"
+    exit
+}
+
+# Execute the command
+Write-Host "Executing command: $cmd"  # Debug output
+Invoke-Expression $cmd
